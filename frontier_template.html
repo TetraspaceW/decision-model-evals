@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Decision models: log score against cost</title>
+<style>
+  .viz-root {
+    color-scheme: light;
+    --page: #f9f9f7;
+    --surface-1: #fcfcfb;
+    --text-primary: #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted: #898781;
+    --grid: #e1e0d9;
+    --axis: #c3c2b7;
+    --border: rgba(11, 11, 11, 0.10);
+    --series-1: #2a78d6;
+    --deemphasis: #898781;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) .viz-root {
+      color-scheme: dark;
+      --page: #0d0d0d;
+      --surface-1: #1a1a19;
+      --text-primary: #f0efec;
+      --text-secondary: #c3c2b7;
+      --grid: #2c2c2a;
+      --axis: #383835;
+      --border: rgba(255, 255, 255, 0.10);
+      --series-1: #3987e5;
+    }
+  }
+  :root[data-theme="dark"] .viz-root {
+    color-scheme: dark;
+    --page: #0d0d0d;
+    --surface-1: #1a1a19;
+    --text-primary: #f0efec;
+    --text-secondary: #c3c2b7;
+    --grid: #2c2c2a;
+    --axis: #383835;
+    --border: rgba(255, 255, 255, 0.10);
+    --series-1: #3987e5;
+  }
+
+  html, body { margin: 0; }
+  .viz-root {
+    min-height: 100vh;
+    box-sizing: border-box;
+    padding: 32px 24px;
+    background: var(--page);
+    color: var(--text-primary);
+    font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; }
+
+  .filters { display: flex; gap: 16px; align-items: center; margin-bottom: 12px; color: var(--text-secondary); }
+  .filters label { display: inline-flex; gap: 6px; align-items: center; cursor: pointer; }
+  .filters label[hidden] { display: none; }
+
+  figure.card {
+    position: relative;
+    margin: 0;
+    padding: 20px 20px 12px;
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+  .card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+  h1 { margin: 0 0 4px; font-size: 16px; font-weight: 600; }
+  .subtitle { margin: 0; max-width: 64ch; color: var(--text-secondary); }
+  .table-toggle {
+    padding: 4px 10px;
+    font: inherit;
+    color: var(--text-primary);
+    white-space: nowrap;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  .table-toggle:hover { background: var(--grid); }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 16px; margin: 12px 0 4px; font-size: 13px; color: var(--text-secondary); }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .legend span[hidden] { display: none; }
+
+  svg.chart { display: block; width: 100%; height: auto; overflow: visible; }
+  svg text { font-family: inherit; }
+  .grid { stroke: var(--grid); stroke-width: 1; shape-rendering: crispEdges; }
+  .axis { stroke: var(--axis); stroke-width: 1; shape-rendering: crispEdges; }
+  .ref { stroke: var(--text-muted); stroke-width: 1; shape-rendering: crispEdges; }
+  .frontier-line { fill: none; stroke: var(--series-1); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+  .frontier-line.with-free { stroke-dasharray: 0 5; }
+  .tick { fill: var(--text-muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+  .axis-title { fill: var(--text-secondary); font-size: 12px; }
+  .point-label { fill: var(--text-secondary); font-size: 12px; }
+  .ref-label { fill: var(--text-muted); font-size: 12px; }
+  .dot { stroke: var(--surface-1); stroke-width: 2; outline: none; }
+  .dot.frontier { fill: var(--series-1); }
+  .dot.dominated { fill: var(--deemphasis); }
+  .dot.free-frontier { fill: var(--surface-1); stroke: var(--series-1); }
+  .dot:focus-visible { stroke: var(--text-primary); }
+
+  .tooltip {
+    position: absolute;
+    min-width: 180px;
+    max-width: 300px;
+    padding: 8px 10px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    pointer-events: none;
+  }
+  .tooltip[hidden] { display: none; }
+  .tooltip .value { font-size: 16px; font-weight: 600; color: var(--text-primary); }
+  .tooltip .model { margin-top: 2px; overflow-wrap: anywhere; }
+
+  .table-wrap { margin-top: 12px; overflow-x: auto; }
+  .table-wrap[hidden] { display: none; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { padding: 6px 10px; text-align: left; border-bottom: 1px solid var(--grid); }
+  th { font-weight: 600; color: var(--text-secondary); }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+<div class="viz-root">
+  <div class="wrap">
+    <div class="filters">
+      <label><input type="checkbox" id="include-free" checked> Include free models</label>
+    </div>
+    <figure class="card" id="card">
+      <div class="card-head">
+        <div>
+          <h1 id="chart-title">Log score against cost</h1>
+          <p class="subtitle">Mean log score on <span id="question-count"></span> resolved Metaculus
+            questions (higher is better), against the average OpenRouter cost per question. A model
+            is on the Pareto frontier when no other model is both at least as cheap and at least
+            as good. The solid frontier counts paid models only; the dotted one counts free
+            models too.</p>
+        </div>
+        <button class="table-toggle" id="table-toggle" aria-expanded="false" aria-controls="table-wrap">Show table</button>
+      </div>
+      <div class="legend">
+        <span><svg width="22" height="10" aria-hidden="true"><line x1="1" y1="5" x2="21" y2="5" class="frontier-line"/><circle cx="11" cy="5" r="4" class="dot frontier" style="stroke-width:0"/></svg>Pareto frontier of paid models</span>
+        <span id="legend-with-free"><svg width="22" height="10" aria-hidden="true"><line x1="1" y1="5" x2="21" y2="5" class="frontier-line with-free"/><circle cx="11" cy="5" r="3.5" class="dot free-frontier" style="stroke-width:1.5"/></svg>Frontier including free models</span>
+        <span><svg width="10" height="10" aria-hidden="true"><circle cx="5" cy="5" r="4" class="dot dominated" style="stroke-width:0"/></svg>Dominated: another model is cheaper and better</span>
+        <span><svg width="22" height="10" aria-hidden="true"><line x1="1" y1="5" x2="21" y2="5" class="ref"/></svg>Always answering 50%</span>
+      </div>
+      <svg class="chart" id="chart" viewBox="0 0 840 460" role="img" aria-labelledby="chart-title"></svg>
+      <div class="tooltip" id="tooltip" hidden></div>
+      <div class="table-wrap" id="table-wrap" hidden>
+        <table>
+          <thead><tr><th>Model</th><th class="num">Cost per million questions</th><th class="num">Log score</th><th class="num">Unanswered</th><th>On frontier</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </figure>
+  </div>
+</div>
+<script id="data" type="application/json">__DATA__</script>
+<script>
+"use strict";
+const data = JSON.parse(document.getElementById("data").textContent);
+const SVG_NS = "http://www.w3.org/2000/svg";
+const W = 840, H = 460;
+const M = { top: 16, right: 24, bottom: 52, left: 64 };
+const FREE_W = 48, FREE_GAP = 20;  // the "Free" column left of the log cost axis
+const HOVER_PX = 24;               // pointer snaps to the nearest dot within this distance
+
+const svg = document.getElementById("chart");
+const card = document.getElementById("card");
+const tooltip = document.getElementById("tooltip");
+const includeFree = document.getElementById("include-free");
+const tableToggle = document.getElementById("table-toggle");
+const tableWrap = document.getElementById("table-wrap");
+const legendWithFree = document.getElementById("legend-with-free");
+document.getElementById("question-count").textContent = data.questions;
+
+const models = data.models.map(m => ({ ...m, perMillion: m.cost * 1e6 }));
+if (!models.some(m => m.cost === 0)) includeFree.closest("label").hidden = true;
+
+const fmtScore = s => s.toFixed(4).replace("-", "−");
+const fmtCost = m => m.cost === 0 ? "Free"
+  : "$" + (m.perMillion >= 10 ? m.perMillion.toFixed(1) : m.perMillion.toFixed(2));
+
+function el(name, attrs, parent = svg) {
+  const node = document.createElementNS(SVG_NS, name);
+  for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, v);
+  parent.appendChild(node);
+  return node;
+}
+
+function dominates(a, b) {
+  return a.cost <= b.cost && a.score >= b.score && (a.cost < b.cost || a.score > b.score);
+}
+
+function status(m) {
+  const by = list => list[0].model + (list.length > 1 ? ` and ${list.length - 1} more` : "");
+  if (m.rivals.length) return `Dominated by ${by(m.rivals)}`;
+  if (m.cost === 0) return "On the frontier including free models";
+  if (!m.dominators.length) return "On the Pareto frontier";
+  return `On the paid frontier, but dominated by free model${m.dominators.length > 1 ? "s" : ""} `
+    + by(m.dominators);
+}
+
+let points = [];  // { m, dot } for every dot drawn, for hover and focus
+let active = null;
+
+function render() {
+  svg.replaceChildren();
+  hide();
+  const shown = models.filter(m => includeFree.checked || m.cost > 0);
+  for (const m of shown) {
+    // Best-scoring dominator first; it is always on a frontier.
+    m.dominators = shown.filter(o => dominates(o, m))
+      .sort((a, b) => b.score - a.score || a.cost - b.cost);
+    // The dominators that count on the model's own frontier: paid ones for a paid
+    // model, since the main frontier leaves free models out. Only free models can
+    // dominate a free one.
+    m.rivals = m.dominators.filter(o => o.cost > 0 || m.cost === 0);
+  }
+  const byCost = (a, b) => a.cost - b.cost || a.score - b.score;
+  const frontier = shown.filter(m => m.cost > 0 && !m.rivals.length).sort(byCost);
+  const withFree = shown.filter(m => !m.dominators.length).sort(byCost);
+  const paid = shown.filter(m => m.cost > 0).map(m => m.perMillion);
+  const hasFree = shown.some(m => m.cost === 0);
+  legendWithFree.hidden = !hasFree;
+
+  const plotL = M.left, plotR = W - M.right, plotT = M.top, plotB = H - M.bottom;
+  const logL = hasFree ? plotL + FREE_W + FREE_GAP : plotL;
+  const lo = Math.log10((paid.length ? Math.min(...paid) : 1) / 1.3);
+  const hi = Math.log10((paid.length ? Math.max(...paid) : 10) * 1.3);
+  const xCost = v => logL + (Math.log10(v) - lo) / (hi - lo) * (plotR - logL);
+  const x = m => m.cost === 0 ? plotL + FREE_W / 2 : xCost(m.perMillion);
+
+  const scores = shown.map(m => m.score).concat(data.baseline);
+  const range = (Math.max(...scores) - Math.min(...scores)) || 0.1;
+  const step = [0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1].find(s => range / s <= 8) || 1;
+  const yLo = Math.min(...scores) - range * 0.06, yHi = Math.max(...scores) + range * 0.06;
+  const y = s => plotB - (s - yLo) / (yHi - yLo) * (plotB - plotT);
+
+  const yBase = y(data.baseline);
+  for (let i = Math.ceil(yLo / step); i <= Math.floor(yHi / step); i++) {
+    const yy = y(i * step);
+    // A gridline this close to the 50% reference line would read as a double line.
+    if (Math.abs(yy - yBase) >= 8) el("line", { x1: plotL, x2: plotR, y1: yy, y2: yy, class: "grid" });
+    el("text", { x: plotL - 8, y: yy + 4, "text-anchor": "end", class: "tick" })
+      .textContent = (i * step).toFixed(2).replace("-", "−");
+  }
+  for (let e = Math.floor(lo); e <= Math.ceil(hi); e++) {
+    for (const k of [1, 2, 5]) {
+      const v = k * 10 ** e;
+      if (Math.log10(v) < lo || Math.log10(v) > hi) continue;
+      el("line", { x1: xCost(v), x2: xCost(v), y1: plotT, y2: plotB, class: "grid" });
+      el("text", { x: xCost(v), y: plotB + 18, "text-anchor": "middle", class: "tick" })
+        .textContent = "$" + (v >= 1 ? v : v.toPrecision(1));
+    }
+  }
+  if (hasFree) {
+    el("line", { x1: plotL, x2: plotL + FREE_W, y1: plotB, y2: plotB, class: "axis" });
+    el("text", { x: plotL + FREE_W / 2, y: plotB + 18, "text-anchor": "middle", class: "tick" })
+      .textContent = "Free";
+  }
+  el("line", { x1: logL, x2: plotR, y1: plotB, y2: plotB, class: "axis" });
+  el("text", { x: (logL + plotR) / 2, y: H - 10, "text-anchor": "middle", class: "axis-title" })
+    .textContent = "OpenRouter cost per million questions (log scale)";
+  el("text", { transform: `translate(16 ${(plotT + plotB) / 2}) rotate(-90)`,
+               "text-anchor": "middle", class: "axis-title" })
+    .textContent = "Mean log score (higher is better)";
+
+  el("line", { x1: plotL, x2: plotR, y1: yBase, y2: yBase, class: "ref" });
+  el("text", { x: plotR, y: yBase - 6, "text-anchor": "end", class: "ref-label" })
+    .textContent = `Always 50% (${fmtScore(data.baseline)})`;
+
+  // The dotted line goes underneath, so the solid one covers it where they coincide.
+  const stairs = line => line.map((m, i) => i ? `H${x(m)}V${y(m.score)}` : `M${x(m)},${y(m.score)}`)
+    .join("");
+  if (hasFree) el("path", { d: stairs(withFree), class: "frontier-line with-free" });
+  if (frontier.length) el("path", { d: stairs(frontier), class: "frontier-line" });
+
+  // Dominated dots first so frontier dots paint on top; each group in cost order.
+  const order = [...shown].sort((a, b) => a.cost - b.cost || b.score - a.score);
+  const paint = [...order].sort((a, b) => !a.rivals.length - !b.rivals.length);
+  const kind = m => m.rivals.length ? "dominated" : m.cost > 0 ? "frontier" : "free-frontier";
+  points = paint.map(m => {
+    const dot = el("circle", { cx: x(m), cy: y(m.score), r: 5, role: "img", tabindex: 0,
+                               class: `dot ${kind(m)}` });
+    dot.setAttribute("aria-label",
+      `${m.model}: log score ${fmtScore(m.score)}, ${fmtCost(m)} per million questions. ${status(m)}.`);
+    dot.addEventListener("focus", () => show(m));
+    dot.addEventListener("blur", hide);
+    return { m, dot };
+  });
+
+  // Direct-label the frontiers only; the tooltip and the table carry the rest. Labels
+  // avoid every dot, the frontier lines, and each other.
+  const obstacles = points.map(p => {
+    const cx = +p.dot.getAttribute("cx"), cy = +p.dot.getAttribute("cy");
+    return { m: p.m, l: cx - 6, r: cx + 6, t: cy - 6, b: cy + 6 };
+  });
+  for (const line of hasFree ? [frontier, withFree] : [frontier]) {
+    for (let i = 1; i < line.length; i++) {
+      const x0 = x(line[i - 1]), x1 = x(line[i]);
+      const y0 = y(line[i - 1].score), y1 = y(line[i].score);
+      obstacles.push({ l: x0, r: x1, t: y0 - 2, b: y0 + 2 },
+                     { l: x1 - 2, r: x1 + 2, t: Math.min(y0, y1), b: Math.max(y0, y1) });
+    }
+  }
+  const overlaps = (a, b) => a.l < b.r && b.l < a.r && a.t < b.b && b.t < a.b;
+  for (const m of order.filter(m => !m.rivals.length)) {
+    const label = el("text", { class: "point-label" });
+    label.textContent = m.model;
+    const w = label.getComputedTextLength(), cx = x(m), cy = y(m.score);
+    const spots = [[cx + 10, cy + 4, "start"], [cx - 10, cy + 4, "end"],
+                   [cx + 6, cy - 9, "start"], [cx + 6, cy + 19, "start"],
+                   [cx, cy - 12, "middle"], [cx, cy + 20, "middle"]];
+    const boxOf = ([tx, ty, anchor]) => {
+      const l = anchor === "start" ? tx : anchor === "end" ? tx - w : tx - w / 2;
+      return { l, r: l + w, t: ty - 12, b: ty + 3 };
+    };
+    const spot = spots.find(s => {
+      const box = boxOf(s);
+      return box.l >= plotL && box.r <= W && box.t >= 0 && box.b <= plotB
+        && !obstacles.some(o => o.m !== m && overlaps(o, box));
+    }) || spots[0];
+    label.setAttribute("x", spot[0]);
+    label.setAttribute("y", spot[1]);
+    label.setAttribute("text-anchor", spot[2]);
+    obstacles.push(boxOf(spot));
+  }
+
+  renderTable(order);
+}
+
+function renderTable(rows) {
+  const tbody = tableWrap.querySelector("tbody");
+  tbody.replaceChildren();
+  for (const m of rows) {
+    const tr = tbody.insertRow();
+    const cells = [[m.model], [fmtCost(m), "num"], [fmtScore(m.score), "num"],
+                   [String(m.missing), "num"],
+                   [m.rivals.length ? "No" : m.cost > 0 ? "Yes" : "Including free"]];
+    for (const [text, cls] of cells) {
+      const td = tr.insertCell();
+      td.textContent = text;
+      if (cls) td.className = cls;
+    }
+  }
+}
+
+function show(m) {
+  const p = points.find(p => p.m === m);
+  if (active && active !== p) active.dot.setAttribute("r", 5);
+  active = p;
+  p.dot.setAttribute("r", 7);
+
+  tooltip.replaceChildren();
+  const line = (text, cls) => {
+    const div = document.createElement("div");
+    div.textContent = text;
+    if (cls) div.className = cls;
+    tooltip.appendChild(div);
+    return div;
+  };
+  const value = line(fmtScore(m.score), "value");
+  const unit = document.createElement("span");
+  unit.textContent = " log score";
+  unit.style.cssText = "font-size:13px;font-weight:400;color:var(--text-secondary)";
+  value.appendChild(unit);
+  line(m.cost === 0 ? "Free" : `${fmtCost(m)} per million questions`);
+  line(m.model, "model");
+  line(status(m));
+  if (m.missing) line(`${m.missing} unanswered, scored as 50%`);
+
+  tooltip.hidden = false;
+  const box = card.getBoundingClientRect(), dot = p.dot.getBoundingClientRect();
+  let left = dot.right - box.left + 12;
+  if (left + tooltip.offsetWidth > box.width - 8) left = dot.left - box.left - 12 - tooltip.offsetWidth;
+  const top = Math.min(dot.top - box.top - 12, box.height - 8 - tooltip.offsetHeight);
+  tooltip.style.left = `${Math.max(8, left)}px`;
+  tooltip.style.top = `${Math.max(8, top)}px`;
+}
+
+function hide() {
+  if (active) active.dot.setAttribute("r", 5);
+  active = null;
+  tooltip.hidden = true;
+}
+
+svg.addEventListener("pointermove", e => {
+  const ctm = svg.getScreenCTM();
+  let best = null, bestDist = HOVER_PX;
+  for (const p of points) {
+    const pt = new DOMPoint(+p.dot.getAttribute("cx"), +p.dot.getAttribute("cy")).matrixTransform(ctm);
+    const dist = Math.hypot(pt.x - e.clientX, pt.y - e.clientY);
+    if (dist < bestDist) { best = p; bestDist = dist; }
+  }
+  if (best) show(best.m); else hide();
+});
+svg.addEventListener("pointerleave", hide);
+includeFree.addEventListener("change", render);
+tableToggle.addEventListener("click", () => {
+  const open = tableWrap.hidden;
+  tableWrap.hidden = !open;
+  tableToggle.setAttribute("aria-expanded", String(open));
+  tableToggle.textContent = open ? "Hide table" : "Show table";
+});
+
+render();
+</script>
+</body>
+</html>

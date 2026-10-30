@@ -1,0 +1,722 @@
+{
+ "source": "https://www.metaculus.com/questions/?status=resolved&forecast_type=binary&order_by=-forecasters_count",
+ "retrieved": "2026-10-27",
+ "description": "Top 100 resolved binary Metaculus questions by number of forecasters, in feed order. Questions resolved Annulled/Ambiguous were skipped (listed in 'excluded').",
+ "excluded": [
+  41310,
+  31347,
+  31340,
+  41332,
+  31277,
+  3681,
+  35101,
+  8483,
+  31275,
+  73,
+  9936,
+  34885,
+  9459
+ ],
+ "questions": [
+  {
+   "id": 31255,
+   "title": "Google, Meta, Amazon, Tesla, or X accept crypto at end-2025?",
+   "resolution": "no",
+   "forecasters": "2.9k",
+   "url": "https://www.metaculus.com/questions/31255/"
+  },
+  {
+   "id": 1100,
+   "title": "Trump reelected by November 10th 2020",
+   "resolution": "no",
+   "forecasters": "2.2k",
+   "url": "https://www.metaculus.com/questions/1100/"
+  },
+  {
+   "id": 31273,
+   "title": "Will a new war kill at least 5,000 people in 2025?",
+   "resolution": "no",
+   "forecasters": "2.1k",
+   "url": "https://www.metaculus.com/questions/31273/"
+  },
+  {
+   "id": 31098,
+   "title": "Donald Trump positive net favorability on December 20, 2025?",
+   "resolution": "no",
+   "forecasters": "2.1k",
+   "url": "https://www.metaculus.com/questions/31098/"
+  },
+  {
+   "id": 41316,
+   "title": "More US sanctions on Russia by Mar 13, 2026?",
+   "resolution": "no",
+   "forecasters": "2k",
+   "url": "https://www.metaculus.com/questions/41316/"
+  },
+  {
+   "id": 30891,
+   "title": "Elon Musk and Donald Trump Falling Out Before 2026?",
+   "resolution": "yes",
+   "forecasters": "1.8k",
+   "url": "https://www.metaculus.com/questions/30891/"
+  },
+  {
+   "id": 31307,
+   "title": "Will NVDA outperform SPY in 2025?",
+   "resolution": "yes",
+   "forecasters": "1.8k",
+   "url": "https://www.metaculus.com/questions/31307/"
+  },
+  {
+   "id": 41343,
+   "title": "High-end GPUs to be exported to China by Mar 13, 2026?",
+   "resolution": "no",
+   "forecasters": "1.8k",
+   "url": "https://www.metaculus.com/questions/41343/"
+  },
+  {
+   "id": 31121,
+   "title": "Ceasefire in the Russo-Ukraine conflict before 2026?",
+   "resolution": "no",
+   "forecasters": "1.8k",
+   "url": "https://www.metaculus.com/questions/31121/"
+  },
+  {
+   "id": 31357,
+   "title": "Leadership change US foreign adversaries in 2025?",
+   "resolution": "no",
+   "forecasters": "1.7k",
+   "url": "https://www.metaculus.com/questions/31357/"
+  },
+  {
+   "id": 41336,
+   "title": "OpenAI API prices fall before Mar 14, 2026?",
+   "resolution": "no",
+   "forecasters": "1.6k",
+   "url": "https://www.metaculus.com/questions/41336/"
+  },
+  {
+   "id": 41302,
+   "title": "≥100 AI layoffs between Jan 12 & Mar 13, 2026?",
+   "resolution": "yes",
+   "forecasters": "1.6k",
+   "url": "https://www.metaculus.com/questions/41302/"
+  },
+  {
+   "id": 9939,
+   "title": "Kyiv to fall to Russian forces by April 2022?",
+   "resolution": "no",
+   "forecasters": "1.6k",
+   "url": "https://www.metaculus.com/questions/9939/"
+  },
+  {
+   "id": 31252,
+   "title": "Will US interest rates be lower at end-2025 than end-2024?",
+   "resolution": "yes",
+   "forecasters": "1.6k",
+   "url": "https://www.metaculus.com/questions/31252/"
+  },
+  {
+   "id": 124,
+   "title": "World Population Grows until 2025",
+   "resolution": "yes",
+   "forecasters": "1.5k",
+   "url": "https://www.metaculus.com/questions/124/"
+  },
+  {
+   "id": 10002,
+   "title": "Putin Presidency on February 1, 2023",
+   "resolution": "yes",
+   "forecasters": "1.5k",
+   "url": "https://www.metaculus.com/questions/10002/"
+  },
+  {
+   "id": 30863,
+   "title": "Will Elon Musk be world's richest person on Dec 31, 2025?",
+   "resolution": "yes",
+   "forecasters": "1.4k",
+   "url": "https://www.metaculus.com/questions/30863/"
+  },
+  {
+   "id": 31258,
+   "title": "Google's Search Market Share Below 85% in 2025?",
+   "resolution": "no",
+   "forecasters": "1.4k",
+   "url": "https://www.metaculus.com/questions/31258/"
+  },
+  {
+   "id": 31118,
+   "title": "Netanyahu remain Prime Minister of Israel throughout 2025?",
+   "resolution": "yes",
+   "forecasters": "1.4k",
+   "url": "https://www.metaculus.com/questions/31118/"
+  },
+  {
+   "id": 31326,
+   "title": "OpenAI tops Chatbot Arena at end-2025?",
+   "resolution": "no",
+   "forecasters": "1.4k",
+   "url": "https://www.metaculus.com/questions/31326/"
+  },
+  {
+   "id": 31256,
+   "title": "Rationalist, EA, or AI safety researcher on Rogan in 2025?",
+   "resolution": "yes",
+   "forecasters": "1.3k",
+   "url": "https://www.metaculus.com/questions/31256/"
+  },
+  {
+   "id": 31296,
+   "title": "Will FY 2025 deportations in the US be ≥2x those of FY 2024?",
+   "resolution": "no",
+   "forecasters": "1.3k",
+   "url": "https://www.metaculus.com/questions/31296/"
+  },
+  {
+   "id": 31298,
+   "title": "1,000 Deaths Due to Israel-Iran Conflict in 2025?",
+   "resolution": "yes",
+   "forecasters": "1.3k",
+   "url": "https://www.metaculus.com/questions/31298/"
+  },
+  {
+   "id": 10246,
+   "title": "Russian Coup or Regime Change before 2024?",
+   "resolution": "no",
+   "forecasters": "1.3k",
+   "url": "https://www.metaculus.com/questions/10246/"
+  },
+  {
+   "id": 31341,
+   "title": "Application to ban AfD in 2025?",
+   "resolution": "no",
+   "forecasters": "1.2k",
+   "url": "https://www.metaculus.com/questions/31341/"
+  },
+  {
+   "id": 41356,
+   "title": "US utility $5B+ capex for data centers in early 2026?",
+   "resolution": "yes",
+   "forecasters": "1.2k",
+   "url": "https://www.metaculus.com/questions/41356/"
+  },
+  {
+   "id": 31044,
+   "title": "US Congress Implements Trump Tariff Policies 2025?",
+   "resolution": "no",
+   "forecasters": "1.2k",
+   "url": "https://www.metaculus.com/questions/31044/"
+  },
+  {
+   "id": 9930,
+   "title": "Russian Invasion of Another Country in 2022",
+   "resolution": "no",
+   "forecasters": "1.2k",
+   "url": "https://www.metaculus.com/questions/9930/"
+  },
+  {
+   "id": 10084,
+   "title": "Swedish NATO Membership by 2024?",
+   "resolution": "no",
+   "forecasters": "1.2k",
+   "url": "https://www.metaculus.com/questions/10084/"
+  },
+  {
+   "id": 13171,
+   "title": "Nuclear Detonation in Ukraine by 2024",
+   "resolution": "no",
+   "forecasters": "1.2k",
+   "url": "https://www.metaculus.com/questions/13171/"
+  },
+  {
+   "id": 8898,
+   "title": "Russian Invasion of Ukraine Before 2023",
+   "resolution": "yes",
+   "forecasters": "1.2k",
+   "url": "https://www.metaculus.com/questions/8898/"
+  },
+  {
+   "id": 3820,
+   "title": "BTC Worth Over 100k USD by 2025?",
+   "resolution": "yes",
+   "forecasters": "1.1k",
+   "url": "https://www.metaculus.com/questions/3820/"
+  },
+  {
+   "id": 20752,
+   "title": "Russo-Ukraine cease-fire in 2024",
+   "resolution": "no",
+   "forecasters": "1.1k",
+   "url": "https://www.metaculus.com/questions/20752/"
+  },
+  {
+   "id": 31076,
+   "title": "US Eliminates Department of Education Before 2026?",
+   "resolution": "no",
+   "forecasters": "1.1k",
+   "url": "https://www.metaculus.com/questions/31076/"
+  },
+  {
+   "id": 31620,
+   "title": "Israel Establishes Government Control of Gaza in 2025?",
+   "resolution": "no",
+   "forecasters": "1.1k",
+   "url": "https://www.metaculus.com/questions/31620/"
+  },
+  {
+   "id": 31271,
+   "title": "US housing prices increase more in 2025 compared to 2024?",
+   "resolution": "no",
+   "forecasters": "1.1k",
+   "url": "https://www.metaculus.com/questions/31271/"
+  },
+  {
+   "id": 31123,
+   "title": "Will Iran possess a nuclear weapon before 2026?",
+   "resolution": "no",
+   "forecasters": "1.1k",
+   "url": "https://www.metaculus.com/questions/31123/"
+  },
+  {
+   "id": 31117,
+   "title": "Argentina's YoY inflation below 30% for December 2025?",
+   "resolution": "no",
+   "forecasters": "1.1k",
+   "url": "https://www.metaculus.com/questions/31117/"
+  },
+  {
+   "id": 31324,
+   "title": "Mifepristone illegal for abortions in the US before 2026?",
+   "resolution": "no",
+   "forecasters": "1.1k",
+   "url": "https://www.metaculus.com/questions/31324/"
+  },
+  {
+   "id": 31045,
+   "title": "Powell Ceases to Hold Fed Chair Before 2026?",
+   "resolution": "no",
+   "forecasters": "1.1k",
+   "url": "https://www.metaculus.com/questions/31045/"
+  },
+  {
+   "id": 31303,
+   "title": "Inflation-adjusted gas prices rise in 2025?",
+   "resolution": "no",
+   "forecasters": "1.1k",
+   "url": "https://www.metaculus.com/questions/31303/"
+  },
+  {
+   "id": 31276,
+   "title": "Argentine poverty lower in early 2025 vs late 2023?",
+   "resolution": "yes",
+   "forecasters": "1k",
+   "url": "https://www.metaculus.com/questions/31276/"
+  },
+  {
+   "id": 6478,
+   "title": "Democrat Wins 2024 US Presidential Election?",
+   "resolution": "no",
+   "forecasters": "1k",
+   "url": "https://www.metaculus.com/questions/6478/"
+  },
+  {
+   "id": 31130,
+   "title": "Major Components of ACA Repealed Before 2026?",
+   "resolution": "no",
+   "forecasters": "1k",
+   "url": "https://www.metaculus.com/questions/31130/"
+  },
+  {
+   "id": 34454,
+   "title": "OpenAI Releases Full o3 Model Before March 28, 2025?",
+   "resolution": "no",
+   "forecasters": "1k",
+   "url": "https://www.metaculus.com/questions/34454/"
+  },
+  {
+   "id": 31315,
+   "title": "Will inflation be lower in Nov 2025 than it was in Nov 2024?",
+   "resolution": "yes",
+   "forecasters": "999",
+   "url": "https://www.metaculus.com/questions/31315/"
+  },
+  {
+   "id": 31253,
+   "title": "US unemployment rate in Nov 2025 below Nov 2024?",
+   "resolution": "no",
+   "forecasters": "979",
+   "url": "https://www.metaculus.com/questions/31253/"
+  },
+  {
+   "id": 31764,
+   "title": "4th person to solve Rubik's cube in <3.44s by Mar 31, 2025?",
+   "resolution": "no",
+   "forecasters": "978",
+   "url": "https://www.metaculus.com/questions/31764/"
+  },
+  {
+   "id": 20768,
+   "title": "10 Deaths Due to Nuclear Detonation in 2024?",
+   "resolution": "no",
+   "forecasters": "964",
+   "url": "https://www.metaculus.com/questions/20768/"
+  },
+  {
+   "id": 31336,
+   "title": "Democrats favored to win 2028 US election on Kalshi?",
+   "resolution": "yes",
+   "forecasters": "952",
+   "url": "https://www.metaculus.com/questions/31336/"
+  },
+  {
+   "id": 41500,
+   "title": "Will Atlas be released for Windows by Mar 13, 2026?",
+   "resolution": "no",
+   "forecasters": "936",
+   "url": "https://www.metaculus.com/questions/41500/"
+  },
+  {
+   "id": 20786,
+   "title": "Trump Felony Conviction Before Election?",
+   "resolution": "yes",
+   "forecasters": "919",
+   "url": "https://www.metaculus.com/questions/20786/"
+  },
+  {
+   "id": 10050,
+   "title": "Bilateral Ceasefire between Russia & Ukraine",
+   "resolution": "no",
+   "forecasters": "917",
+   "url": "https://www.metaculus.com/questions/10050/"
+  },
+  {
+   "id": 31348,
+   "title": "US Government Releases Additional Epstein Documents in 2025?",
+   "resolution": "yes",
+   "forecasters": "914",
+   "url": "https://www.metaculus.com/questions/31348/"
+  },
+  {
+   "id": 34456,
+   "title": "US Debt Ceiling Increased Before March 17, 2025?",
+   "resolution": "no",
+   "forecasters": "913",
+   "url": "https://www.metaculus.com/questions/34456/"
+  },
+  {
+   "id": 9941,
+   "title": "Russian Control of Ukrainian Cities by June",
+   "resolution": "no",
+   "forecasters": "903",
+   "url": "https://www.metaculus.com/questions/9941/"
+  },
+  {
+   "id": 10154,
+   "title": "Radiation Incident in Ukraine by 2024",
+   "resolution": "no",
+   "forecasters": "897",
+   "url": "https://www.metaculus.com/questions/10154/"
+  },
+  {
+   "id": 34415,
+   "title": "Starship IFT-8 160 KM Altitude Before March 10, 2025?",
+   "resolution": "no",
+   "forecasters": "887",
+   "url": "https://www.metaculus.com/questions/34415/"
+  },
+  {
+   "id": 31691,
+   "title": "Bayrou Out as PM of France Before March 31, 2025?",
+   "resolution": "no",
+   "forecasters": "880",
+   "url": "https://www.metaculus.com/questions/31691/"
+  },
+  {
+   "id": 10085,
+   "title": "Finnish NATO Membership by 2024",
+   "resolution": "yes",
+   "forecasters": "879",
+   "url": "https://www.metaculus.com/questions/10085/"
+  },
+  {
+   "id": 41501,
+   "title": "China #1 for Japan visitors in Jan 2026?",
+   "resolution": "no",
+   "forecasters": "876",
+   "url": "https://www.metaculus.com/questions/41501/"
+  },
+  {
+   "id": 13531,
+   "title": "Crimea-Russia Land Bridge Severed by 2024?",
+   "resolution": "no",
+   "forecasters": "862",
+   "url": "https://www.metaculus.com/questions/13531/"
+  },
+  {
+   "id": 9935,
+   "title": "25K Russo-Ukrainian War Deaths in 2022",
+   "resolution": "yes",
+   "forecasters": "857",
+   "url": "https://www.metaculus.com/questions/9935/"
+  },
+  {
+   "id": 31257,
+   "title": "Semaglutide taken off FDA's drug shortage list in 2025?",
+   "resolution": "yes",
+   "forecasters": "857",
+   "url": "https://www.metaculus.com/questions/31257/"
+  },
+  {
+   "id": 40726,
+   "title": "New NVDA record close in February 2026?",
+   "resolution": "no",
+   "forecasters": "854",
+   "url": "https://www.metaculus.com/questions/40726/"
+  },
+  {
+   "id": 41213,
+   "title": "China UST holdings below $675B in Dec 2025?",
+   "resolution": "no",
+   "forecasters": "853",
+   "url": "https://www.metaculus.com/questions/41213/"
+  },
+  {
+   "id": 40967,
+   "title": "Will Starmer leave office in 2026?",
+   "resolution": "yes",
+   "forecasters": "847",
+   "url": "https://www.metaculus.com/questions/40967/"
+  },
+  {
+   "id": 10094,
+   "title": "Russia Controls Kyiv on June 1, 2022",
+   "resolution": "no",
+   "forecasters": "832",
+   "url": "https://www.metaculus.com/questions/10094/"
+  },
+  {
+   "id": 41140,
+   "title": "AI 3 hour time horizon METR 80%?",
+   "resolution": "yes",
+   "forecasters": "828",
+   "url": "https://www.metaculus.com/questions/41140/"
+  },
+  {
+   "id": 2671,
+   "title": "US Astronauts Land on Moon by 2025",
+   "resolution": "no",
+   "forecasters": "825",
+   "url": "https://www.metaculus.com/questions/2671/"
+  },
+  {
+   "id": 41090,
+   "title": "New country winner of the 2026 World Cup?",
+   "resolution": "no",
+   "forecasters": "821",
+   "url": "https://www.metaculus.com/questions/41090/"
+  },
+  {
+   "id": 10004,
+   "title": "German Nuclear Power Operational June 1, 2023",
+   "resolution": "no",
+   "forecasters": "794",
+   "url": "https://www.metaculus.com/questions/10004/"
+  },
+  {
+   "id": 10081,
+   "title": "Ukraine in EU before 2024",
+   "resolution": "no",
+   "forecasters": "791",
+   "url": "https://www.metaculus.com/questions/10081/"
+  },
+  {
+   "id": 20781,
+   "title": "X bankruptcy in 2024?",
+   "resolution": "no",
+   "forecasters": "786",
+   "url": "https://www.metaculus.com/questions/20781/"
+  },
+  {
+   "id": 20753,
+   "title": "Netanyahu PM Through 2024?",
+   "resolution": "yes",
+   "forecasters": "783",
+   "url": "https://www.metaculus.com/questions/20753/"
+  },
+  {
+   "id": 9937,
+   "title": "50K Russo-Ukrainian War deaths in 2022",
+   "resolution": "yes",
+   "forecasters": "772",
+   "url": "https://www.metaculus.com/questions/9937/"
+  },
+  {
+   "id": 41358,
+   "title": "German 10Y yield ±20bps in Feb 2026?",
+   "resolution": "no",
+   "forecasters": "768",
+   "url": "https://www.metaculus.com/questions/41358/"
+  },
+  {
+   "id": 41091,
+   "title": "Will WHO declare a PHEIC in 2026?",
+   "resolution": "yes",
+   "forecasters": "763",
+   "url": "https://www.metaculus.com/questions/41091/"
+  },
+  {
+   "id": 41699,
+   "title": "U.S. consumer sentiment increase Feb to Mar 2026?",
+   "resolution": "no",
+   "forecasters": "761",
+   "url": "https://www.metaculus.com/questions/41699/"
+  },
+  {
+   "id": 5383,
+   "title": "Donald Trump USA President on 2021-01-21",
+   "resolution": "no",
+   "forecasters": "755",
+   "url": "https://www.metaculus.com/questions/5383/"
+  },
+  {
+   "id": 41361,
+   "title": "U.S. gasoline supplied highest in last week of Feb 2026?",
+   "resolution": "no",
+   "forecasters": "753",
+   "url": "https://www.metaculus.com/questions/41361/"
+  },
+  {
+   "id": 10662,
+   "title": "Elon Musk Acquires Twitter in 2022",
+   "resolution": "yes",
+   "forecasters": "749",
+   "url": "https://www.metaculus.com/questions/10662/"
+  },
+  {
+   "id": 40864,
+   "title": "Artemis II success in 2026?",
+   "resolution": "yes",
+   "forecasters": "743",
+   "url": "https://www.metaculus.com/questions/40864/"
+  },
+  {
+   "id": 40927,
+   "title": "Will Andre Ventura win Portugal's 2026 presidential election?",
+   "resolution": "no",
+   "forecasters": "740",
+   "url": "https://www.metaculus.com/questions/40927/"
+  },
+  {
+   "id": 20694,
+   "title": "S&P Goes Up In 2024?",
+   "resolution": "yes",
+   "forecasters": "736",
+   "url": "https://www.metaculus.com/questions/20694/"
+  },
+  {
+   "id": 12591,
+   "title": "Nuclear Detonation in Ukraine by 2023",
+   "resolution": "no",
+   "forecasters": "735",
+   "url": "https://www.metaculus.com/questions/12591/"
+  },
+  {
+   "id": 10003,
+   "title": "Russian Invasion of Baltics by 2024",
+   "resolution": "no",
+   "forecasters": "730",
+   "url": "https://www.metaculus.com/questions/10003/"
+  },
+  {
+   "id": 6330,
+   "title": "Donald Trump 2024 Presidential Campaign",
+   "resolution": "yes",
+   "forecasters": "728",
+   "url": "https://www.metaculus.com/questions/6330/"
+  },
+  {
+   "id": 40875,
+   "title": "US manufacturing jobs more than 12.7m in Feb 2026?",
+   "resolution": "no",
+   "forecasters": "727",
+   "url": "https://www.metaculus.com/questions/40875/"
+  },
+  {
+   "id": 20775,
+   "title": "Starship Reaches Orbit in 2024?",
+   "resolution": "no",
+   "forecasters": "726",
+   "url": "https://www.metaculus.com/questions/20775/"
+  },
+  {
+   "id": 20747,
+   "title": "Bitcoin up over 2024",
+   "resolution": "yes",
+   "forecasters": "719",
+   "url": "https://www.metaculus.com/questions/20747/"
+  },
+  {
+   "id": 31831,
+   "title": "2025 Rugby Six Nations Championship Won by 5 or More Points?",
+   "resolution": "no",
+   "forecasters": "719",
+   "url": "https://www.metaculus.com/questions/31831/"
+  },
+  {
+   "id": 10053,
+   "title": "Putin Charged for War Crimes 2024",
+   "resolution": "yes",
+   "forecasters": "716",
+   "url": "https://www.metaculus.com/questions/10053/"
+  },
+  {
+   "id": 20779,
+   "title": "Will Biden and Trump Debate in 2024?",
+   "resolution": "yes",
+   "forecasters": "714",
+   "url": "https://www.metaculus.com/questions/20779/"
+  },
+  {
+   "id": 10269,
+   "title": "Kyiv Under Russian Control before 2023",
+   "resolution": "no",
+   "forecasters": "707",
+   "url": "https://www.metaculus.com/questions/10269/"
+  },
+  {
+   "id": 10040,
+   "title": "YouTube Blocked in Russia in 2022",
+   "resolution": "no",
+   "forecasters": "698",
+   "url": "https://www.metaculus.com/questions/10040/"
+  },
+  {
+   "id": 2797,
+   "title": "No Non-Test Nuclear Detonations by 2024",
+   "resolution": "yes",
+   "forecasters": "686",
+   "url": "https://www.metaculus.com/questions/2797/"
+  },
+  {
+   "id": 9994,
+   "title": "5M Ukrainian Refugees",
+   "resolution": "yes",
+   "forecasters": "683",
+   "url": "https://www.metaculus.com/questions/9994/"
+  },
+  {
+   "id": 395,
+   "title": "A restaurant serving cultured meat by 2021?",
+   "resolution": "yes",
+   "forecasters": "679",
+   "url": "https://www.metaculus.com/questions/395/"
+  },
+  {
+   "id": 19308,
+   "title": "Hamas loses de facto control of Gaza by 2024?",
+   "resolution": "no",
+   "forecasters": "669",
+   "url": "https://www.metaculus.com/questions/19308/"
+  }
+ ]
+}
