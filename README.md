@@ -56,8 +56,9 @@ Text models answer without reasoning first. A model that can reason also gets
 `"reasoning": {"enabled": false}`. That isn't sent to models that can't reason,
 because then no provider would accept the request. A model whose reasoning can't be
 turned off gets the lowest effort it supports instead, e.g.
-`"reasoning": {"effort": "minimal"}` for GPT-5 Nano. Models with no effort setting
-are rejected before the run starts. Neither setting always stops the reasoning. Even
+`"reasoning": {"effort": "minimal"}` for GPT-5 Nano. A model with no effort setting
+gets no `reasoning` parameter, so it reasons at its default effort. Neither setting
+always stops the reasoning. Even
 with reasoning off, some models still report a few dozen reasoning tokens; Mercury 2.5
 does, for example. At its lowest effort (`low`), GLM Flash can still use hundreds.
 
@@ -103,8 +104,7 @@ uv run evaluate.py                       # print the leaderboard
 
 Model ids are OpenRouter model ids, e.g. `typesafe/jev-1.14`. Before it starts,
 the script looks each one up in OpenRouter's model list. Decision models are asked
-through the Decisions API, and text models through chat completions. A text model
-must be able to turn reasoning off or choose an effort. OpenRouter filters the model list by your account's
+through the Decisions API, and text models through chat completions. OpenRouter filters the model list by your account's
 privacy and provider settings, so a model those settings block is rejected even if it
 is on the public list. In a models file, put one id per line; `#` starts a comment.
 

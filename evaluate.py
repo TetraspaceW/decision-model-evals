@@ -4,7 +4,8 @@ Each question is posed to decision models through OpenRouter's Decisions API as 
 Noul (yes/no) question, and the model returns the probability that it resolved YES.
 Text models are asked through chat completions instead, and must state the
 probability in JSON matching a schema, with reasoning off or, for models that can't
-turn it off, at their lowest effort. The schema is enforced through structured outputs
+turn it off, at their lowest effort (or their default, if they have no effort
+setting). The schema is enforced through structured outputs
 where the model supports them, and otherwise given in the prompt.
 
     uv run evaluate.py MODEL [MODEL ...]     evaluate models, skipping ones already done
@@ -84,7 +85,8 @@ class FatalError(Exception):
 
 class Route(NamedTuple):
     """How a model is asked: "decisions" or "chat". For a chat model that can reason,
-    the reasoning parameter that turns it off or down, and whether the model supports
+    the reasoning parameter that turns it off or down, if it has one, and whether the
+    model supports
     structured outputs; if it doesn't, the schema goes in the prompt."""
     api: str
     reasoning: dict | None = None
@@ -102,8 +104,7 @@ def make_client() -> httpx.Client:
 
 def model_routes(client: httpx.Client, models: list[str]) -> dict[str, Route]:
     """Map each model id to how it's asked: through the Decisions API for decision
-    models, through chat completions for text models that can turn reasoning off or
-    choose an effort. Exits on any other id."""
+    models, through chat completions for text models. Exits on any other id."""
     def listed(**params) -> dict[str, dict]:
         resp = client.get("/v1/models", params=params)
         return {m["id"]: m for m in resp.raise_for_status().json()["data"]}
@@ -126,13 +127,11 @@ def model_routes(client: httpx.Client, models: list[str]) -> dict[str, Route]:
         elif not reasoning.get("mandatory"):
             routes[model] = Route("chat", {"enabled": False}, structured)
         else:
-            # Reasoning can't be turned off, so ask for the lowest effort it has.
+            # Reasoning can't be turned off, so ask for the lowest effort it has, or
+            # leave it at the default if it has no effort setting.
             efforts = [e for e in EFFORTS if e in reasoning.get("supported_efforts", [])]
-            if efforts:
-                routes[model] = Route("chat", {"effort": efforts[0]}, structured)
-            else:
-                problems.append(f"{model}: text model that can't turn reasoning off "
-                                "or choose an effort")
+            routes[model] = Route("chat", {"effort": efforts[0]} if efforts else None,
+                                  structured)
     if problems:
         sys.exit("\n".join(problems))
     return routes
@@ -313,8 +312,7 @@ def main() -> None:
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("models", nargs="*",
                         help="OpenRouter model ids: decision models, e.g. typesafe/jev-1.14, "
-                             "or text models that can turn reasoning off or choose an "
-                             "effort")
+                             "or text models")
     parser.add_argument("-f", "--models-file", type=Path,
                         help="file with one model id per line (# starts a comment)")
     parser.add_argument("--force", action="store_true",
