@@ -134,13 +134,20 @@ uv run frontier.py           # write frontier.html
 uv run frontier.py --open    # write it and open it in a browser
 ```
 
-This writes `frontier.html`, a standalone page that plots each model's log score
+This writes `frontier.html`, a standalone page that plots each model's score
 against the average cost per question that OpenRouter charged (`usage.cost` in its
 results). Models on the Pareto frontier are highlighted and joined by a step line.
 A model is on the frontier when no other model is at least as cheap and at least
 as good. Hover over a dot, or tab to it, for details. "Show table" lists every
 model. Free (`:free`) models take the cheap end of the frontier, so a checkbox
-leaves them out and recomputes it.
+leaves them out and recomputes it. "Open weights only" does the same for models
+whose weights aren't published, going by `licences.json` (see [Files](#files)); the
+tooltip and the table show each model's licence. Below the chart is a checkbox for each model
+creator (the part of the model id before `/`); unchecking one hides that creator's
+models and recomputes the frontier without them. "All" and "None" check or uncheck
+every creator at once. The "Score" setting switches the chart and table between log
+score, [Brier score and accuracy](#scoring), and recomputes the frontier for the one
+chosen.
 
 ## Scoring
 
@@ -153,6 +160,14 @@ rank  log score  missing  api        model
   probability given to the outcome that happened. Higher is better; 0 is perfect.
 - Probabilities are clipped to [0.1%, 99.9%], the range Metaculus accepts, so a
   single confident miss can't send a score to −∞.
+- **Brier score**, which `frontier.py` can plot instead, is the mean of (p − o)²,
+  where p is the probability of YES and o is 1 if the question resolved YES and 0 if
+  not. Lower is better; 0 is perfect, and always answering 50% scores 0.25.
+  Probabilities aren't clipped for it, since a confident miss costs at most 1.
+- **Accuracy**, also in `frontier.py`, is the fraction of questions where the
+  probability was on the side of 50% that happened: above it for YES, below it for
+  NO. Exactly 50% gets half credit, so always answering 50% scores 50%. Only which
+  side of 50% a forecast is on counts, so it doesn't reward calibration.
 - **missing** counts questions where every request failed. These are scored as 50%.
 - **api** is `decisions` for a decision model and `chat` for a text model (see
   [Text models](#text-models)).
@@ -172,6 +187,12 @@ past events as well as how well it forecasts.
   `samples/`.
 - `frontier.py` and `frontier_template.html`: the cost-against-score chart (see
   above). `frontier.py` fills the template with data and writes `frontier.html`.
+- `licences.json`: whether each model's weights are `open` (downloadable), `closed`
+  or `unknown`, with the licence, the Hugging Face repo for open weights, and
+  sometimes a note, retrieved 2026-11-22. Open means downloadable, not OSI open
+  source: the Gemma 3, LFM and Nace.AI Open RAIL-M licences restrict use. It is
+  kept by hand. `frontier.py` counts a model missing from it as `unknown` and says
+  so on stderr.
 - `questions.json`: the dataset. These are the top 100 resolved binary Metaculus
   questions by number of forecasters, retrieved 2026-10-27. Each has an `id`,
   `title`, `resolution` (`yes`/`no`), forecaster count and `url`. Questions

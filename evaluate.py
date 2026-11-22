@@ -283,6 +283,33 @@ def score(results: dict[int, dict], questions: list[dict]) -> tuple[float, int]:
     return total / len(questions), missing
 
 
+def brier_score(results: dict[int, dict], questions: list[dict]) -> float:
+    """Mean Brier score: the squared difference between the probability of YES and the
+    outcome (1 or 0). Lower is better. Unanswered questions are scored as 50%. Nothing
+    is clipped, since a confident miss costs at most 1."""
+    total = 0.0
+    for q in questions:
+        p = results.get(q["id"], {}).get("probability")
+        if p is None:
+            p = 0.5
+        total += (p - (q["resolution"] == "yes")) ** 2
+    return total / len(questions)
+
+
+def accuracy(results: dict[int, dict], questions: list[dict]) -> float:
+    """Fraction of questions where the probability was on the side of 50% that
+    happened. Exactly 50%, including unanswered questions, gets half credit: what
+    breaking the tie with a coin flip would get on average."""
+    total = 0.0
+    for q in questions:
+        p = results.get(q["id"], {}).get("probability")
+        if p is None or p == 0.5:
+            total += 0.5
+        elif (p > 0.5) == (q["resolution"] == "yes"):
+            total += 1
+    return total / len(questions)
+
+
 def leaderboard(questions: list[dict]) -> None:
     rows = []
     for model, results in all_results().items():

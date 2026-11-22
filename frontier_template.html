@@ -57,6 +57,29 @@
   .filters { display: flex; gap: 16px; align-items: center; margin-bottom: 12px; color: var(--text-secondary); }
   .filters label { display: inline-flex; gap: 6px; align-items: center; cursor: pointer; }
   .filters label[hidden] { display: none; }
+  .filters select {
+    padding: 2px 4px;
+    font: inherit;
+    color: var(--text-primary);
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+  }
+
+  .creators-head { display: flex; gap: 8px; align-items: center; margin: 12px 0 6px; font-size: 13px; color: var(--text-secondary); }
+  .creators-head span { margin-right: 4px; font-weight: 600; }
+  .creators-head button {
+    padding: 1px 8px;
+    font: inherit;
+    color: var(--text-primary);
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .creators-head button:hover { background: var(--grid); }
+  .creators { display: flex; flex-wrap: wrap; gap: 4px 16px; margin-bottom: 4px; font-size: 13px; color: var(--text-secondary); }
+  .creators label { display: inline-flex; gap: 6px; align-items: center; cursor: pointer; }
 
   figure.card {
     position: relative;
@@ -131,15 +154,24 @@
 <div class="viz-root">
   <div class="wrap">
     <div class="filters">
+      <label>Score
+        <select id="metric">
+          <option value="log">Log score</option>
+          <option value="brier">Brier score</option>
+          <option value="accuracy">Accuracy</option>
+        </select>
+      </label>
       <label><input type="checkbox" id="include-free" checked> Include free models</label>
+      <label><input type="checkbox" id="open-only"> Open weights only</label>
     </div>
     <figure class="card" id="card">
       <div class="card-head">
         <div>
           <h1 id="chart-title">Log score against cost</h1>
-          <p class="subtitle">Mean log score on <span id="question-count"></span> resolved Metaculus
-            questions (higher is better), against the average OpenRouter cost per question. A model
-            is on the Pareto frontier when no other model is both at least as cheap and at least
+          <p class="subtitle"><span id="metric-mean">Mean log score</span> on
+            <span id="question-count"></span> resolved Metaculus questions
+            (<span id="metric-better">higher</span> is better), against the average OpenRouter
+            cost per question. A model is on the Pareto frontier when no other model is both at least as cheap and at least
             as good. The solid frontier counts paid models only; the dotted one counts free
             models too.</p>
         </div>
@@ -152,10 +184,16 @@
         <span><svg width="22" height="10" aria-hidden="true"><line x1="1" y1="5" x2="21" y2="5" class="ref"/></svg>Always answering 50%</span>
       </div>
       <svg class="chart" id="chart" viewBox="0 0 840 460" role="img" aria-labelledby="chart-title"></svg>
+      <div class="creators-head">
+        <span id="creators-title">Model creators</span>
+        <button id="creators-all">All</button>
+        <button id="creators-none">None</button>
+      </div>
+      <div class="creators" id="creators" role="group" aria-labelledby="creators-title"></div>
       <div class="tooltip" id="tooltip" hidden></div>
       <div class="table-wrap" id="table-wrap" hidden>
         <table>
-          <thead><tr><th>Model</th><th class="num">Cost per million questions</th><th class="num">Log score</th><th class="num">Unanswered</th><th>On frontier</th></tr></thead>
+          <thead><tr><th>Model</th><th class="num">Cost per million questions</th><th class="num" id="score-head">Log score</th><th class="num">Unanswered</th><th>Weights</th><th>On frontier</th></tr></thead>
           <tbody></tbody>
         </table>
       </div>
@@ -176,17 +214,56 @@ const svg = document.getElementById("chart");
 const card = document.getElementById("card");
 const tooltip = document.getElementById("tooltip");
 const includeFree = document.getElementById("include-free");
+const openOnly = document.getElementById("open-only");
 const tableToggle = document.getElementById("table-toggle");
 const tableWrap = document.getElementById("table-wrap");
 const legendWithFree = document.getElementById("legend-with-free");
+const metricSelect = document.getElementById("metric");
 document.getElementById("question-count").textContent = data.questions;
 
-const models = data.models.map(m => ({ ...m, perMillion: m.cost * 1e6 }));
+const models = data.models.map(m => ({ ...m, perMillion: m.cost * 1e6, creator: m.model.split("/")[0] }));
 if (!models.some(m => m.cost === 0)) includeFree.closest("label").hidden = true;
 
-const fmtScore = s => s.toFixed(4).replace("-", "−");
+// One checkbox per creator (the part of the model id before "/"), all checked to start.
+const creatorBoxes = [...new Set(models.map(m => m.creator))].sort().map(creator => {
+  const label = document.createElement("label");
+  const box = document.createElement("input");
+  box.type = "checkbox";
+  box.value = creator;
+  box.checked = true;
+  box.addEventListener("change", render);
+  label.append(box, creator);
+  document.getElementById("creators").appendChild(label);
+  return box;
+});
+for (const [id, checked] of [["creators-all", true], ["creators-none", false]]) {
+  document.getElementById(id).addEventListener("click", () => {
+    for (const box of creatorBoxes) box.checked = checked;
+    render();
+  });
+}
+
+// The scores the Score setting can show, keyed like the data. sign makes higher better
+// for all of them, so the chart keeps better at the top and dominance works the same way.
+// fmt formats a score, tick an axis label.
+const num = digits => v => v.toFixed(digits).replace("-", "−");
+const pct = digits => v => (v * 100).toFixed(digits) + "%";
+const METRICS = {
+  log: { label: "Log score", name: "log score", mean: "Mean log score", better: "higher",
+         sign: 1, fmt: num(4), tick: num(2) },
+  brier: { label: "Brier score", name: "Brier score", mean: "Mean Brier score",
+           better: "lower", sign: -1, fmt: num(4), tick: num(2) },
+  accuracy: { label: "Accuracy", name: "accuracy", mean: "Accuracy", better: "higher",
+              sign: 1, fmt: pct(1), tick: pct(0) },
+};
+let metric = METRICS.log;
+
+// Takes a signed score (see render) and shows the score itself.
+const fmtScore = s => metric.fmt(metric.sign * s);
 const fmtCost = m => m.cost === 0 ? "Free"
   : "$" + (m.perMillion >= 10 ? m.perMillion.toFixed(1) : m.perMillion.toFixed(2));
+const fmtWeights = m => m.weights === "open" ? `Open, ${m.licence}`
+  : m.weights === "closed" ? "Closed" : "Unknown";
 
 function el(name, attrs, parent = svg) {
   const node = document.createElementNS(SVG_NS, name);
@@ -214,7 +291,18 @@ let active = null;
 function render() {
   svg.replaceChildren();
   hide();
-  const shown = models.filter(m => includeFree.checked || m.cost > 0);
+  metric = METRICS[metricSelect.value];
+  // m.score is the chosen score, signed so that higher is better.
+  for (const m of models) m.score = metric.sign * m[metricSelect.value];
+  const baseline = metric.sign * data.baselines[metricSelect.value];
+  document.title = `Decision models: ${metric.name} against cost`;
+  document.getElementById("chart-title").textContent = `${metric.label} against cost`;
+  document.getElementById("metric-mean").textContent = metric.mean;
+  document.getElementById("metric-better").textContent = metric.better;
+  document.getElementById("score-head").textContent = metric.label;
+  const creators = new Set(creatorBoxes.filter(b => b.checked).map(b => b.value));
+  const shown = models.filter(m => (includeFree.checked || m.cost > 0)
+    && (!openOnly.checked || m.weights === "open") && creators.has(m.creator));
   for (const m of shown) {
     // Best-scoring dominator first; it is always on a frontier.
     m.dominators = shown.filter(o => dominates(o, m))
@@ -238,19 +326,19 @@ function render() {
   const xCost = v => logL + (Math.log10(v) - lo) / (hi - lo) * (plotR - logL);
   const x = m => m.cost === 0 ? plotL + FREE_W / 2 : xCost(m.perMillion);
 
-  const scores = shown.map(m => m.score).concat(data.baseline);
+  const scores = shown.map(m => m.score).concat(baseline);
   const range = (Math.max(...scores) - Math.min(...scores)) || 0.1;
   const step = [0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1].find(s => range / s <= 8) || 1;
   const yLo = Math.min(...scores) - range * 0.06, yHi = Math.max(...scores) + range * 0.06;
   const y = s => plotB - (s - yLo) / (yHi - yLo) * (plotB - plotT);
 
-  const yBase = y(data.baseline);
+  const yBase = y(baseline);
   for (let i = Math.ceil(yLo / step); i <= Math.floor(yHi / step); i++) {
     const yy = y(i * step);
     // A gridline this close to the 50% reference line would read as a double line.
     if (Math.abs(yy - yBase) >= 8) el("line", { x1: plotL, x2: plotR, y1: yy, y2: yy, class: "grid" });
     el("text", { x: plotL - 8, y: yy + 4, "text-anchor": "end", class: "tick" })
-      .textContent = (i * step).toFixed(2).replace("-", "−");
+      .textContent = metric.tick(metric.sign * i * step);
   }
   for (let e = Math.floor(lo); e <= Math.ceil(hi); e++) {
     for (const k of [1, 2, 5]) {
@@ -271,11 +359,11 @@ function render() {
     .textContent = "OpenRouter cost per million questions (log scale)";
   el("text", { transform: `translate(16 ${(plotT + plotB) / 2}) rotate(-90)`,
                "text-anchor": "middle", class: "axis-title" })
-    .textContent = "Mean log score (higher is better)";
+    .textContent = `${metric.mean} (${metric.better} is better)`;
 
   el("line", { x1: plotL, x2: plotR, y1: yBase, y2: yBase, class: "ref" });
   el("text", { x: plotR, y: yBase - 6, "text-anchor": "end", class: "ref-label" })
-    .textContent = `Always 50% (${fmtScore(data.baseline)})`;
+    .textContent = `Always 50% (${fmtScore(baseline)})`;
 
   // The dotted line goes underneath, so the solid one covers it where they coincide.
   const stairs = line => line.map((m, i) => i ? `H${x(m)}V${y(m.score)}` : `M${x(m)},${y(m.score)}`)
@@ -291,7 +379,7 @@ function render() {
     const dot = el("circle", { cx: x(m), cy: y(m.score), r: 5, role: "img", tabindex: 0,
                                class: `dot ${kind(m)}` });
     dot.setAttribute("aria-label",
-      `${m.model}: log score ${fmtScore(m.score)}, ${fmtCost(m)} per million questions. ${status(m)}.`);
+      `${m.model}: ${metric.name} ${fmtScore(m.score)}, ${fmtCost(m)} per million questions. ${status(m)}.`);
     dot.addEventListener("focus", () => show(m));
     dot.addEventListener("blur", hide);
     return { m, dot };
@@ -343,7 +431,7 @@ function renderTable(rows) {
   for (const m of rows) {
     const tr = tbody.insertRow();
     const cells = [[m.model], [fmtCost(m), "num"], [fmtScore(m.score), "num"],
-                   [String(m.missing), "num"],
+                   [String(m.missing), "num"], [fmtWeights(m)],
                    [m.rivals.length ? "No" : m.cost > 0 ? "Yes" : "Including free"]];
     for (const [text, cls] of cells) {
       const td = tr.insertCell();
@@ -369,11 +457,12 @@ function show(m) {
   };
   const value = line(fmtScore(m.score), "value");
   const unit = document.createElement("span");
-  unit.textContent = " log score";
+  unit.textContent = ` ${metric.name}`;
   unit.style.cssText = "font-size:13px;font-weight:400;color:var(--text-secondary)";
   value.appendChild(unit);
   line(m.cost === 0 ? "Free" : `${fmtCost(m)} per million questions`);
   line(m.model, "model");
+  line(`Weights: ${fmtWeights(m)}`);
   line(status(m));
   if (m.missing) line(`${m.missing} unanswered, scored as 50%`);
 
@@ -404,6 +493,8 @@ svg.addEventListener("pointermove", e => {
 });
 svg.addEventListener("pointerleave", hide);
 includeFree.addEventListener("change", render);
+openOnly.addEventListener("change", render);
+metricSelect.addEventListener("change", render);
 tableToggle.addEventListener("click", () => {
   const open = tableWrap.hidden;
   tableWrap.hidden = !open;
